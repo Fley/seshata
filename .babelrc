@@ -1,0 +1,14 @@
+{
+  "presets": ["env", "react"],
+  "ast": false,
+  "auxiliaryCommentAfter": false,
+  "auxiliaryCommentBefore": false,
+  "comments": false,
+  "compact": "auto",
+  "minified": true,
+  "sourceType": "module",
+  "ignore": [
+    "node_modules"
+  ],
+  "plugins": ["transform-object-rest-spread"]
+}
