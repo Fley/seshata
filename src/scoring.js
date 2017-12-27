@@ -1,6 +1,13 @@
+import logger from './logger';
 import * as CARD from './card.js';
 
-const scoreGame = (game = {}, leftGame = {}, rightGame = {}) => {
+export const scoreGames = (games = []) => {
+  logger.info('Score games', games);
+  throw { statusCode: 424, message: 'hola' };
+  // return { games };
+};
+
+export const scoreGame = (game = {}, leftGame = {}, rightGame = {}) => {
   const score = {
     military: scoreMilitary(game.militaryConflicts),
     treasury: scoreTreasury(game.treasury),
@@ -12,8 +19,6 @@ const scoreGame = (game = {}, leftGame = {}, rightGame = {}) => {
   };
   return { ...score, total: Object.values(score).reduce(sum, 0) };
 };
-
-export default scoreGame;
 
 const sum = (a, b) => a + b;
 const sumVictoryPoints = (score, card) => score + (card.victoryPoints || 0);
@@ -31,15 +36,15 @@ export const scoreCivilian = (civilianCards = []) => civilianCards.reduce(sumVic
 export const scoreScientific = (game = {}) => {
   const { scientificCards = [], wonder = [], guildCards = [] } = game;
   const scientificJokers = [
-    ...wonder.filter(card => card.type === CARD.WONDER_TABLET_COMPASS_GEAR),
+    ...wonder.filter(card => card.type === CARD.WONDER.TABLET_COMPASS_GEAR),
     ...guildCards.filter(card => card.type === CARD.GUILD_TABLET_COMPASS_GEAR)
   ];
 
   const countByTypes = scientificCards.reduce((types, card) => {
     return {
-      tablet: types.tablet + (card.type === CARD.SCIENTIFIC_TABLET ? 1 : 0),
-      gear: types.gear + (card.type === CARD.SCIENTIFIC_GEAR ? 1 : 0),
-      compass: types.compass + (card.type === CARD.SCIENTIFIC_COMPASS ? 1 : 0)
+      tablet: types.tablet + (card.type === CARD.SCIENTIFIC.TABLET ? 1 : 0),
+      gear: types.gear + (card.type === CARD.SCIENTIFIC.GEAR ? 1 : 0),
+      compass: types.compass + (card.type === CARD.SCIENTIFIC.COMPASS ? 1 : 0)
     };
   }, {
       tablet: 0,
@@ -49,9 +54,9 @@ export const scoreScientific = (game = {}) => {
 
   if (scientificJokers.length === 1) {
     const symbols = [
-      { type: CARD.SCIENTIFIC_TABLET, count: countByTypes.tablet },
-      { type: CARD.SCIENTIFIC_GEAR, count: countByTypes.gear },
-      { type: CARD.SCIENTIFIC_COMPASS, count: countByTypes.compass }
+      { type: CARD.SCIENTIFIC.TABLET, count: countByTypes.tablet },
+      { type: CARD.SCIENTIFIC.GEAR, count: countByTypes.gear },
+      { type: CARD.SCIENTIFIC.COMPASS, count: countByTypes.compass }
     ].sort((a, b) => a.count - b.count);
     if (symbols[2].count - symbols[0].count >= 4 || symbols[1].count === symbols[0].count) {
       // Difference between max and min is greater or equals to 4 OR no room for more lines, add joker to bigger
@@ -80,13 +85,13 @@ const applyScientificScoring = (...countByTypes) =>
 export const scoreCommercial = (game = {}) =>
   !game.commercialCards ? 0 : game.commercialCards.reduce((commercialScore, commercialCard) => {
     switch (commercialCard.type) {
-      case CARD.COMMERCIAL_1VP_OWN_RAWGOODS:
+      case CARD.COMMERCIAL.VP1_OWN_RAWGOODS:
         return addPointsPerCard(1)(commercialScore, game.rawgoodsCards);
-      case CARD.COMMERCIAL_1VP_OWN_MANUFACTUREDGOODS:
+      case CARD.COMMERCIAL.VP1_OWN_MANUFACTUREDGOODS:
         return addPointsPerCard(1)(commercialScore, game.manufacturedgoodsCards);
-      case CARD.COMMERCIAL_1VP_OWN_COMMERICAL:
+      case CARD.COMMERCIAL.VP1_OWN_COMMERICAL:
         return addPointsPerCard(1)(commercialScore, game.commercialCards);
-      case CARD.COMMERCIAL_1VP_OWN_WONDER:
+      case CARD.COMMERCIAL.VP1_OWN_WONDER:
         return addPointsPerCard(1)(commercialScore, game.wonder);
       default:
         return commercialScore;
@@ -94,7 +99,7 @@ export const scoreCommercial = (game = {}) =>
   }, 0);
 
 export const scoreGuilds = (game = {}, leftGame = {}, rightGame = {}) => {
-  const neighborGuilds = (game.wonder || []).find(card => card.type === CARD.WONDER_GUILD_EXCHANGE) ?
+  const neighborGuilds = (game.wonder || []).find(card => card.type === CARD.WONDER.GUILD_EXCHANGE) ?
     [...(leftGame.guildCards || []), ...(rightGame.guildCards || [])] : [];
   return neighborGuilds.reduce(
     (maxScore, additionalGuildCard) => Math.max(maxScore, applysScoreGuilds({
@@ -108,25 +113,25 @@ export const scoreGuilds = (game = {}, leftGame = {}, rightGame = {}) => {
 const applysScoreGuilds = (game = {}, leftGame = {}, rightGame = {}) =>
   !game.guildCards ? 0 : game.guildCards.reduce((guildsScore, guildCard) => {
     switch (guildCard.type) {
-      case CARD.GUILD_1VP_ALL_WONDER:
+      case CARD.GUILD.VP1_ALL_WONDER:
         return [game.wonder, leftGame.wonder, rightGame.wonder].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_NEIGHBOR_CIVILIAN:
+      case CARD.GUILD.VP1_NEIGHBOR_CIVILIAN:
         return [leftGame.civilianCards, rightGame.civilianCards].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_NEIGHBOR_COMMERCIAL:
+      case CARD.GUILD.VP1_NEIGHBOR_COMMERCIAL:
         return [leftGame.commercialCards, rightGame.commercialCards].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_NEIGHBOR_DEFEAT:
+      case CARD.GUILD.VP1_NEIGHBOR_DEFEAT:
         return [
           (leftGame.militaryConflicts || []).filter(isMilitaryConflictDefeat),
           (rightGame.militaryConflicts || []).filter(isMilitaryConflictDefeat)
         ].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_NEIGHBOR_MILITARY:
+      case CARD.GUILD.VP1_NEIGHBOR_MILITARY:
         return [leftGame.militaryCards, rightGame.militaryCards].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_NEIGHBOR_RAWGOODS:
+      case CARD.GUILD.VP1_NEIGHBOR_RAWGOODS:
         return [leftGame.rawgoodsCards, rightGame.rawgoodsCards].reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_1VP_OWN_RAWGOODS_MANUFACTUREDGOODS_GUILD:
+      case CARD.GUILD.VP1_OWN_RAWGOODS_MANUFACTUREDGOODS_GUILD:
         return [game.rawgoodsCards, game.manufacturedgoodsCards, game.guildCards]
           .reduce(addPointsPerCard(1), guildsScore);
-      case CARD.GUILD_2VP_NEIGHBOR_MANUFACTUREDGOODS:
+      case CARD.GUILD.VP2_NEIGHBOR_MANUFACTUREDGOODS:
         return [leftGame.manufacturedgoodsCards, rightGame.manufacturedgoodsCards]
           .reduce(addPointsPerCard(2), guildsScore);
       default:

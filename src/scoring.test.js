@@ -1,5 +1,5 @@
 import * as CARD from './card';
-import scoreGame, * as scoring from './scoring';
+import * as scoring from './scoring';
 
 describe('Scoring', () => {
 
@@ -9,15 +9,15 @@ describe('Scoring', () => {
       const game = {
         militaryConflicts: [1, 2, 3, -1],
         civilianCards: [
-          CARD.create(CARD.CIVILIAN_VP, 1),
-          CARD.create(CARD.CIVILIAN_VP, 2),
-          CARD.create(CARD.CIVILIAN_VP, 3),
-          CARD.create(CARD.CIVILIAN_VP, 4)
+          CARD.create(CARD.CIVILIAN.VP, 1),
+          CARD.create(CARD.CIVILIAN.VP, 2),
+          CARD.create(CARD.CIVILIAN.VP, 3),
+          CARD.create(CARD.CIVILIAN.VP, 4)
         ]
       };
       const leftGame = {};
       const rightGame = {};
-      expect(scoreGame(game, leftGame, rightGame)).toMatchObject({
+      expect(scoring.scoreGame(game, leftGame, rightGame)).toMatchObject({
         military: 5,
         treasury: 0,
         wonder: 0,
@@ -59,10 +59,10 @@ describe('Scoring', () => {
   describe('Score wonder', () => {
     it('should compute the wonder score when the game has wonder', () => {
       const wonder = [
-        CARD.create(CARD.WONDER_VP, 3),
-        CARD.create(CARD.WONDER_VP, 6),
-        CARD.create(CARD.WONDER_VP, 4),
-        CARD.create(CARD.WONDER_GENERAL)
+        CARD.create(CARD.WONDER.VP, 3),
+        CARD.create(CARD.WONDER.VP, 6),
+        CARD.create(CARD.WONDER.VP, 4),
+        CARD.create(CARD.WONDER.GENERAL)
       ];
       expect(scoring.scoreWonder(wonder)).toBe(13);
     });
@@ -77,10 +77,10 @@ describe('Scoring', () => {
   describe('Score civilian sctructures', () => {
     it('should compute the civilian score when the game has civilian structures', () => {
       const score = scoring.scoreCivilian([
-        CARD.create(CARD.CIVILIAN_VP, 3),
-        CARD.create(CARD.CIVILIAN_VP, 5),
-        CARD.create(CARD.CIVILIAN_VP, 6),
-        CARD.create(CARD.CIVILIAN_VP, 8)
+        CARD.create(CARD.CIVILIAN.VP, 3),
+        CARD.create(CARD.CIVILIAN.VP, 5),
+        CARD.create(CARD.CIVILIAN.VP, 6),
+        CARD.create(CARD.CIVILIAN.VP, 8)
       ]);
       expect(score).toBe(22);
     });
@@ -93,9 +93,9 @@ describe('Scoring', () => {
   });
 
   describe('Score scientific cards', () => {
-    const T = CARD.create(CARD.SCIENTIFIC_TABLET);
-    const G = CARD.create(CARD.SCIENTIFIC_GEAR);
-    const C = CARD.create(CARD.SCIENTIFIC_COMPASS);
+    const T = CARD.create(CARD.SCIENTIFIC.TABLET);
+    const G = CARD.create(CARD.SCIENTIFIC.GEAR);
+    const C = CARD.create(CARD.SCIENTIFIC.COMPASS);
     const gameWithNoJoker = {
       scientificCards: [
         C, C, C, C,
@@ -106,7 +106,7 @@ describe('Scoring', () => {
     const gameWithOneJoker = { guildCards: [CARD.create(CARD.GUILD_TABLET_COMPASS_GEAR)] };
     const gameWithTwoJokers = {
       guildCards: [CARD.create(CARD.GUILD_TABLET_COMPASS_GEAR)],
-      wonder: [CARD.create(CARD.WONDER_TABLET_COMPASS_GEAR)]
+      wonder: [CARD.create(CARD.WONDER.TABLET_COMPASS_GEAR)]
     };
 
     it('should compute the scientific score without joker', () => {
@@ -199,10 +199,10 @@ describe('Scoring', () => {
 
   describe('Score commercial structures', () => {
     const game = {
-      rawgoodsCards: [CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS)],
-      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS), CARD.create(CARD.MANUFACTURED_GOODS)],
-      commercialCards: [CARD.create(CARD.COMMERCIAL_GENERAL)],
-      wonder: [CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL)]
+      rawgoodsCards: [CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY)],
+      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS.ANY), CARD.create(CARD.MANUFACTURED_GOODS.ANY)],
+      commercialCards: [CARD.create(CARD.COMMERCIAL.GENERAL)],
+      wonder: [CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL)]
     };
 
     it('should compute the commercial score with all special commercial cards', () => {
@@ -210,10 +210,10 @@ describe('Scoring', () => {
         ...game,
         commercialCards: [
           ...game.commercialCards,
-          CARD.create(CARD.COMMERCIAL_1VP_OWN_COMMERICAL),
-          CARD.create(CARD.COMMERCIAL_1VP_OWN_MANUFACTUREDGOODS),
-          CARD.create(CARD.COMMERCIAL_1VP_OWN_RAWGOODS),
-          CARD.create(CARD.COMMERCIAL_1VP_OWN_WONDER)
+          CARD.create(CARD.COMMERCIAL.VP1_OWN_COMMERICAL),
+          CARD.create(CARD.COMMERCIAL.VP1_OWN_MANUFACTUREDGOODS),
+          CARD.create(CARD.COMMERCIAL.VP1_OWN_RAWGOODS),
+          CARD.create(CARD.COMMERCIAL.VP1_OWN_WONDER)
         ]
       })).toBe(13);
     });
@@ -234,34 +234,34 @@ describe('Scoring', () => {
       militaryConflicts: [1, 2, 3, 4, -1, -2, -4],
       militaryCards: [CARD.create(CARD.MILITARY), CARD.create(CARD.MILITARY)],
       civilianCards: [
-        CARD.create(CARD.CIVILIAN_VP, 1),
-        CARD.create(CARD.CIVILIAN_VP, 2),
-        CARD.create(CARD.CIVILIAN_VP, 3),
-        CARD.create(CARD.CIVILIAN_VP, 4)
+        CARD.create(CARD.CIVILIAN.VP, 1),
+        CARD.create(CARD.CIVILIAN.VP, 2),
+        CARD.create(CARD.CIVILIAN.VP, 3),
+        CARD.create(CARD.CIVILIAN.VP, 4)
       ],
-      rawgoodsCards: [CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS)],
-      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS), CARD.create(CARD.MANUFACTURED_GOODS)],
-      commercialCards: [CARD.create(CARD.COMMERCIAL_GENERAL)],
-      wonder: [CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL)]
+      rawgoodsCards: [CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY)],
+      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS.ANY), CARD.create(CARD.MANUFACTURED_GOODS.ANY)],
+      commercialCards: [CARD.create(CARD.COMMERCIAL.GENERAL)],
+      wonder: [CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL)]
     };
     const leftGame = {
       militaryCards: [CARD.create(CARD.MILITARY), CARD.create(CARD.MILITARY)],
       civilianCards: [
-        CARD.create(CARD.CIVILIAN_VP, 1),
-        CARD.create(CARD.CIVILIAN_VP, 2),
-        CARD.create(CARD.CIVILIAN_VP, 3),
-        CARD.create(CARD.CIVILIAN_VP, 4)
+        CARD.create(CARD.CIVILIAN.VP, 1),
+        CARD.create(CARD.CIVILIAN.VP, 2),
+        CARD.create(CARD.CIVILIAN.VP, 3),
+        CARD.create(CARD.CIVILIAN.VP, 4)
       ],
-      rawgoodsCards: [CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS)],
-      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS)],
-      commercialCards: [CARD.create(CARD.COMMERCIAL_GENERAL)],
-      guildCards: [CARD.create(CARD.GUILD_1VP_NEIGHBOR_CIVILIAN)]
+      rawgoodsCards: [CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY)],
+      manufacturedgoodsCards: [CARD.create(CARD.MANUFACTURED_GOODS.ANY)],
+      commercialCards: [CARD.create(CARD.COMMERCIAL.GENERAL)],
+      guildCards: [CARD.create(CARD.GUILD.VP1_NEIGHBOR_CIVILIAN)]
     };
     const rightGame = {
       militaryConflicts: [1, 2, 3, 4, -1, -2, -4],
-      rawgoodsCards: [CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS), CARD.create(CARD.RAW_GOODS)],
-      wonder: [CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL), CARD.create(CARD.WONDER_GENERAL)],
-      guildCards: [CARD.create(CARD.GUILD_1VP_ALL_WONDER)]
+      rawgoodsCards: [CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY), CARD.create(CARD.RAW_GOODS.ANY)],
+      wonder: [CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL), CARD.create(CARD.WONDER.GENERAL)],
+      guildCards: [CARD.create(CARD.GUILD.VP1_ALL_WONDER)]
     };
 
 
@@ -269,15 +269,15 @@ describe('Scoring', () => {
       expect(scoring.scoreGuilds({
         ...game,
         guildCards: [
-          CARD.create(CARD.GUILD_1VP_ALL_WONDER),
-          CARD.create(CARD.GUILD_1VP_NEIGHBOR_CIVILIAN),
-          CARD.create(CARD.GUILD_1VP_NEIGHBOR_COMMERCIAL),
-          CARD.create(CARD.GUILD_1VP_NEIGHBOR_DEFEAT),
-          CARD.create(CARD.GUILD_1VP_NEIGHBOR_MILITARY),
-          CARD.create(CARD.GUILD_1VP_NEIGHBOR_RAWGOODS),
-          CARD.create(CARD.GUILD_1VP_OWN_RAWGOODS_MANUFACTUREDGOODS_GUILD),
-          CARD.create(CARD.GUILD_2VP_NEIGHBOR_MANUFACTUREDGOODS),
-          CARD.create(CARD.GUILD_TABLET_COMPASS_GEAR)
+          CARD.create(CARD.GUILD.VP1_ALL_WONDER),
+          CARD.create(CARD.GUILD.VP1_NEIGHBOR_CIVILIAN),
+          CARD.create(CARD.GUILD.VP1_NEIGHBOR_COMMERCIAL),
+          CARD.create(CARD.GUILD.VP1_NEIGHBOR_DEFEAT),
+          CARD.create(CARD.GUILD.VP1_NEIGHBOR_MILITARY),
+          CARD.create(CARD.GUILD.VP1_NEIGHBOR_RAWGOODS),
+          CARD.create(CARD.GUILD.VP1_OWN_RAWGOODS_MANUFACTUREDGOODS_GUILD),
+          CARD.create(CARD.GUILD.VP2_NEIGHBOR_MANUFACTUREDGOODS),
+          CARD.create(CARD.GUILD.TABLET_COMPASS_GEAR)
         ]
       }, leftGame, rightGame)).toBe(37);
     });
@@ -285,7 +285,7 @@ describe('Scoring', () => {
     it('should compute the highest possible guilds score with exchange guild card', () => {
       expect(scoring.scoreGuilds({
         ...game,
-        wonder: [...game.wonder, CARD.create(CARD.WONDER_GUILD_EXCHANGE)]
+        wonder: [...game.wonder, CARD.create(CARD.WONDER.GUILD_EXCHANGE)]
       }, leftGame, rightGame)).toBe(7);
     });
 
